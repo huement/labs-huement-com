@@ -17,9 +17,7 @@ COPY . /app
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV PORT=8080
-ENV FRANKENPHP_CONFIG="web_server {
-    listen :8080
-}"
+ENV SERVER_NAME=":8080"
 
 # Install Composer dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
