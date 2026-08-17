@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.4-alpine
+FROM dunglas/frankenphp:php8.4-alpine
 
 # Install PHP extensions required by Laravel
 RUN install-php-extensions \
