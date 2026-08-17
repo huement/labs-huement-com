@@ -1,12 +1,13 @@
 FROM dunglas/frankenphp:php8.4-alpine
 
-# Install PHP extensions required by Laravel
+# Install PHP extensions required by Laravel & Octane
 RUN install-php-extensions \
     pdo_mysql \
     gd \
     intl \
     zip \
-    opcache
+    opcache \
+    pcntl
 
 WORKDIR /app
 
