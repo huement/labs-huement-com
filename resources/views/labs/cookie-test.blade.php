@@ -112,7 +112,8 @@
     <div class="card">
         <h3>04 // Legitimate User Intent (Control)</h3>
         <p>Clicking an actual link. AEGIS registers <code>pointerdown</code> intent first, so AEGIS will
-            <strong>ALLOW</strong> this cookie write.</p>
+            <strong>ALLOW</strong> this cookie write.
+        </p>
         <a href="javascript:void(0)" onclick="triggerLegitClick()" class="btn btn-green">Click Legitimate Link</a>
     </div>
 
@@ -121,32 +122,56 @@
     <script>
         const logElem = document.getElementById('console');
 
-        function log(msg) {
-            logElem.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        function log(msg, details) {
+            console.log(msg, details);
+            let logMsg = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            if (details) {
+                logMsg += `\n${JSON.stringify(details, null, 2)}`;
+            }
+            logElem.innerText = logMsg;
         }
 
         if (window.location.search.includes('redirect_executed=true')) {
             log(
-            "REDIRECT COMPLETE: 'partner_tag=unsolicited_redirect_chain_777' set via 302 response headers. Check AEGIS extension!");
+                "REDIRECT COMPLETE: 'partner_tag=unsolicited_redirect_chain_777' set via 302 response headers. Check AEGIS extension!"
+                );
         }
 
         function triggerJsStuffing() {
-            document.cookie = "aff_id=unsolicited_js_stuff_123; path=/; max-age=3600";
-            log("DROPPED: 'aff_id=unsolicited_js_stuff_123' via JS DOM execution.");
+            log("Executing Unsolicited JS Cookie Drop via API...");
+            fetch('/cookie-test/api/stuff-js')
+                .then(res => res.json())
+                .then(data => {
+                    log(`DROPPED: '${data.cookie}' via JS-initiated Set-Cookie Header.`, data);
+                })
+                .catch(err => {
+                    log("ERROR: Could not execute JS stuffing test.", err);
+                });
         }
 
         function triggerHttpStuffing() {
+            log("Executing Background Pixel Request via API...");
             fetch('/cookie-test/api/stuff-http')
                 .then(res => res.json())
                 .then(data => {
-                    log(`DROPPED: '${data.cookie}' via Laravel Set-Cookie Header.`);
+                    log(`DROPPED: '${data.cookie}' via Laravel Set-Cookie Header.`, data);
+                })
+                .catch(err => {
+                    log("ERROR: Could not execute HTTP stuffing test.", err);
                 });
         }
 
         function triggerLegitClick() {
+            log("Simulating legitimate click and API call...");
             setTimeout(() => {
-                document.cookie = "aff_id=legitimate_user_click_456; path=/; max-age=3600";
-                log("DROPPED: 'aff_id=legitimate_user_click_456' AFTER user intent was registered.");
+                fetch('/cookie-test/api/stuff-legit')
+                    .then(res => res.json())
+                    .then(data => {
+                        log(`DROPPED: '${data.cookie}' AFTER user intent was registered.`, data);
+                    })
+                    .catch(err => {
+                        log("ERROR: Could not execute legit click test.", err);
+                    });
             }, 100);
         }
     </script>
