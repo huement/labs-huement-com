@@ -11,6 +11,10 @@ Route::get('/', function () {
     return view('splash');
 });
 
+Route::get('/health', function () {
+    return response('OK', 200);
+});
+
 /*
  * |--------------------------------------------------------------------------
  * | LAB 01: Cookie Stuffing Lab (/cookie-test)
