@@ -1,5 +1,8 @@
 FROM dunglas/frankenphp:php8.4-alpine
 
+# Disable the base image's hardcoded healthcheck
+HEALTHCHECK NONE
+
 # Install PHP extensions required by Laravel & Octane
 RUN install-php-extensions \
     pdo_mysql \
