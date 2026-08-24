@@ -117,6 +117,28 @@
         <a href="javascript:void(0)" onclick="triggerLegitClick()" class="btn btn-green">Click Legitimate Link</a>
     </div>
 
+    <!-- 05 // Early Timing Test Card -->
+    <div class="card">
+        <h3>05 // Immediate Page-Load Drop (Early Timing &lt; 500ms)</h3>
+        <p>Fires automatically on DOM load without user interaction to verify the Early Timing score penalty.</p>
+        <div id="onload-status" style="color: #eab308; font-size: 0.8rem;">Executing on load...</div>
+    </div>
+
+    <!-- 06 // Ad-Tech Suppression Test Card -->
+    <div class="card">
+        <h3>06 // Programmatic Ad-Tech Pixel (Suppression Control)</h3>
+        <p>Simulates a display ad exchange cookie sync (e.g. DoubleClick/The Trade Desk). Should <strong>NOT</strong>
+            trigger a commission fraud alert.</p>
+        <button onclick="triggerAdTechSync()">Fire Ad-Tech Sync</button>
+    </div>
+
+    <!-- 07 // LZ Novelty (Cross-Domain) Instructions -->
+    <div class="card">
+        <h3>07 // LZ Novelty Test (Cross-Domain)</h3>
+        <p>Load an external tracking image from a domain not in your navigation history:</p>
+        <button onclick="triggerNoveltyPixel()">Inject Third-Party Pixel</button>
+    </div>
+
     <div id="console" class="log">READY // Waiting for test execution...</div>
 
     <script>
@@ -134,7 +156,7 @@
         if (window.location.search.includes('redirect_executed=true')) {
             log(
                 "REDIRECT COMPLETE: 'partner_tag=unsolicited_redirect_chain_777' set via 302 response headers. Check AEGIS extension!"
-                );
+            );
         }
 
         function triggerJsStuffing() {
@@ -173,6 +195,33 @@
                         log("ERROR: Could not execute legit click test.", err);
                     });
             }, 100);
+        }
+
+        // 1. AUTOMATED ON-LOAD TRIGGER (Tests Early Timing < 500ms)
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/cookie-test/api/stuff-onload')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('onload-status').innerText = "AUTOMATED DROP FIRED AT < 500ms";
+                    log("ON-LOAD DROP EXECUTED: Check extension for 'Early timing' reason code.", data);
+                });
+        });
+
+        // 2. AD-TECH SUPPRESSION TRIGGER
+        function triggerAdTechSync() {
+            fetch('/cookie-test/api/adtech-sync')
+                .then(res => res.json())
+                .then(data => {
+                    log("AD-TECH SYNC DROPPED: Should be suppressed from commission fraud alerts.", data);
+                });
+        }
+
+        // 3. LZ NOVELTY (CROSS-DOMAIN) TRIGGER
+        function triggerNoveltyPixel() {
+            const img = new Image();
+            // Point this to an unvisited local domain (e.g. http://novel-tracker.test) or external URL
+            img.src = "https://www.doubleclick.net/favicon.ico?affid=999&t=" + Date.now();
+            log("INJECTED NOVEL DOMAIN PIXEL: Domain not in navDict.");
         }
     </script>
 </body>
