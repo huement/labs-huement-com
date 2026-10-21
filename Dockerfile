@@ -1,4 +1,6 @@
-FROM dunglas/frankenphp:php8.4-alpine
+# Security floor: PHP 8.5.12. Dokploy builds this image.
+# FrankenPHP 1.13.2 is the release built on that PHP patch.
+FROM dunglas/frankenphp:1.13.2-php8.5.12-alpine
 
 # Disable the base image's hardcoded healthcheck
 HEALTHCHECK NONE
